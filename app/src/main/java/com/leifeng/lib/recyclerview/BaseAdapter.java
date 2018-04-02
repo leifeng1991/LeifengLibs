@@ -15,7 +15,6 @@ import java.util.List;
 
 
 public abstract class BaseAdapter<T> extends MultiItemTypeAdapter<T> {
-
     protected Context mContext;
     protected int mLayoutId;
     protected LayoutInflater mInflater;
