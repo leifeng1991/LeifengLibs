@@ -85,7 +85,7 @@ public class MainActivity extends BaseActivity {
 
         }*/
 
-        ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
+       /* ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
         for (int i = 0; i < 10; i++) {
             final int finalI = i;
             singleThreadExecutor.execute(new Runnable() {
@@ -99,9 +99,7 @@ public class MainActivity extends BaseActivity {
                     }
                 }
             });
-        }
-
-        GlideApp.with(mContext).load("");
+        }*/
 
     }
 
@@ -169,7 +167,7 @@ public class MainActivity extends BaseActivity {
             }
         });
         // 网络请求
-        RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getUser(""), new BaseObserver<UserBean>(mActivity) {
+        RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getUser("2222332"), new BaseObserver<UserBean>(mActivity) {
             @Override
             public void onSuccess(UserBean bean) {
                 List<UserBean.DataBean> data = bean.getData();

@@ -59,7 +59,8 @@ public interface BaseAPI {
     @PUT("user/photo")
     Call<UserBean> updateUser(@Part("photo") RequestBody photo, @Part("description") RequestBody description);
 
+    @FormUrlEncoded
     @POST("getStoreUser")
-    Observable<UserBean> getUser(@Query("store_id") String store_id);
+    Observable<UserBean> getUser(@Field("store_id") String store_id);
 
 }

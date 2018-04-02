@@ -18,13 +18,11 @@ import com.scwang.smartrefresh.layout.listener.OnRefreshLoadMoreListener;
 import java.util.List;
 
 /**
- * 描述:
+ * 描述:下拉刷新和上拉加载
  *
  * @author leifeng
- *         2018/3/15 11:13
+ * 2018/3/15 11:13
  */
-
-
 public class RefreshLoadView extends RelativeLayout {
     private ProgressRelativeLayout mLoadingLayout;
     private SmartRefreshLayout mSmartRefreshLayout;
@@ -76,7 +74,7 @@ public class RefreshLoadView extends RelativeLayout {
                             if (loadingListener != null)
                                 loadingListener.onRefresh(page);
                         }
-                    },2000);
+                    }, 2000);
 
                 }
 
@@ -92,7 +90,7 @@ public class RefreshLoadView extends RelativeLayout {
                                     loadingListener.onLoadMore(page);
                             }
                         }
-                    },2000);
+                    }, 2000);
 
                 }
             });
@@ -125,7 +123,7 @@ public class RefreshLoadView extends RelativeLayout {
             // 添加数据
             adapter.addList(list);
             // 加载完成
-            mSmartRefreshLayout.finishLoadMore(0,true,list != null && list.size() < 20);
+            mSmartRefreshLayout.finishLoadMore(0, true, list != null && list.size() < 20);
         }
     }
 
@@ -146,9 +144,9 @@ public class RefreshLoadView extends RelativeLayout {
                         loadingListener.onRefresh(page);
                 }
             });
-        }else {
+        } else {
             // 加载完成
-            mSmartRefreshLayout.finishLoadMore(0,false,false);
+            mSmartRefreshLayout.finishLoadMore(0, false, false);
         }
     }
 
