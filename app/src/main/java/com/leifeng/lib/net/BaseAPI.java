@@ -1,6 +1,7 @@
 package com.leifeng.lib.net;
 
 
+import com.leifeng.lib.OnLineOrderListBean;
 import com.leifeng.lib.UserBean;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -24,7 +26,7 @@ import retrofit2.http.QueryMap;
  * 描述:API
  *
  * @author leifeng
- *         2018/3/21 16:53
+ * 2018/3/21 16:53
  */
 public interface BaseAPI {
     /**
@@ -62,5 +64,18 @@ public interface BaseAPI {
     @FormUrlEncoded
     @POST("getStoreUser")
     Observable<UserBean> getUser(@Field("store_id") String store_id);
+
+    @Headers({"Phone-Brand:generic_x86",
+            "App-Key:zhaolin",
+            "Phone-Version:1.0.9",
+            "Phone-System:4.4.2",
+            "Phone-Series:Android SDK built for x86",
+            "Phone-Model:android",
+            "Uid:111509",
+            "Signature:d2e950c4f8aec5a119f3593be5a966af45aee6a9",
+            "Timestamp:1522723763"})
+    @FormUrlEncoded
+    @POST("orderShouyin")
+    Observable<OnLineOrderListBean> getOrderShouyin(@Field("page") String page, @Field("store_id") String store_id, @Field("stoptime") String stoptime, @Field("starttime") String starttime);
 
 }

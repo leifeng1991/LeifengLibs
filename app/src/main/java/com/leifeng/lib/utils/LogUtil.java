@@ -11,6 +11,7 @@ import static com.leifeng.lib.constants.BaseConstants.B.IS_DEBUG;
  *         2016/8/16 14:27
  */
 public class LogUtil {
+    private static int LOG_MAX_LENGTH = 2000;
 
     private LogUtil() {
     }
@@ -62,6 +63,116 @@ public class LogUtil {
 
     public static void e(String tag, String msg) {
         if (isDebug) Log.i(tag, msg);
+    }
+
+    /******************************日志打印不全解决方法*************************************/
+
+    public static void V(String msg) {
+        V("LogUtil", msg);
+    }
+
+    public static void V(String tagName, String msg) {
+        if (isDebug) {
+            int strLength = msg.length();
+            int start = 0;
+            int end = LOG_MAX_LENGTH;
+            for (int i = 0; i < 100; i++) {
+                if (strLength > end) {
+                    Log.v(tagName + i, msg.substring(start, end));
+                    start = end;
+                    end = end + LOG_MAX_LENGTH;
+                } else {
+                    Log.v(tagName + i, msg.substring(start, strLength));
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void D(String msg) {
+        D("LogUtil", msg);
+    }
+    public static void D(String tagName, String msg) {
+        if (isDebug) {
+            int strLength = msg.length();
+            int start = 0;
+            int end = LOG_MAX_LENGTH;
+            for (int i = 0; i < 100; i++) {
+                if (strLength > end) {
+                    Log.d(tagName + i, msg.substring(start, end));
+                    start = end;
+                    end = end + LOG_MAX_LENGTH;
+                } else {
+                    Log.d(tagName + i, msg.substring(start, strLength));
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void I(String msg) {
+        I("LogUtil", msg);
+    }
+
+    public static void I(String tagName, String msg) {
+        if (isDebug) {
+            int strLength = msg.length();
+            int start = 0;
+            int end = LOG_MAX_LENGTH;
+            for (int i = 0; i < 100; i++) {
+                if (strLength > end) {
+                    Log.i(tagName, msg.substring(start, end));
+                    start = end;
+                    end = end + LOG_MAX_LENGTH;
+                } else {
+                    Log.i(tagName, msg.substring(start, strLength));
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void W(String msg) {
+        W("LogUtil", msg);
+    }
+
+    public static void W(String tagName, String msg) {
+        if (isDebug) {
+            int strLength = msg.length();
+            int start = 0;
+            int end = LOG_MAX_LENGTH;
+            for (int i = 0; i < 100; i++) {
+                if (strLength > end) {
+                    Log.w(tagName + i, msg.substring(start, end));
+                    start = end;
+                    end = end + LOG_MAX_LENGTH;
+                } else {
+                    Log.w(tagName + i, msg.substring(start, strLength));
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void E(String msg) {
+        E("LogUtil", msg);
+    }
+    public static void E(String tagName, String msg) {
+        if (isDebug) {
+            int strLength = msg.length();
+            int start = 0;
+            int end = LOG_MAX_LENGTH;
+            for (int i = 0; i < 100; i++) {
+                if (strLength > end) {
+                    Log.e(tagName + i, msg.substring(start, end));
+                    start = end;
+                    end = end + LOG_MAX_LENGTH;
+                } else {
+                    Log.e(tagName + i, msg.substring(start, strLength));
+                    break;
+                }
+            }
+        }
     }
 
 }

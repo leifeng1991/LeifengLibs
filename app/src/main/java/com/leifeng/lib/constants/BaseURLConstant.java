@@ -9,5 +9,6 @@ package com.leifeng.lib.constants;
 
 
 public interface BaseURLConstant {
-    String BASE_URL = "http://sysp7test.zhaolin365.com/api/index/";
+//    String BASE_URL = "http://sysp7test.zhaolin365.com/api/index/";
+    String BASE_URL = "https://appad.zhaolin365.com/shop/Index/";
 }

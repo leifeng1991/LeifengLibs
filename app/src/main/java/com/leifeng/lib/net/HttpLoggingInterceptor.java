@@ -167,14 +167,22 @@ public class HttpLoggingInterceptor implements Interceptor {
             }
 
             Headers headers = request.headers();
+            String headerStr = "";
             for (int i = 0, count = headers.size(); i < count; i++) {
                 String name = headers.name(i);
                 // Skip headers from the request body as they are explicitly logged above.
                 if (!"Content-Type".equalsIgnoreCase(name) && !"Content-Length".equalsIgnoreCase(name)) {
 //                    logger.log(name + ": " + headers.value(i));
-                    LogUtil.e("请求头：" + name + ": " + headers.value(i));
+
+                    if (i == 0) {
+                        headerStr = name + ": " + headers.value(i);
+                    } else {
+                        headerStr = headerStr + "," + name + ": " + headers.value(i);
+                    }
                 }
             }
+
+            LogUtil.e("请求头：[" + headerStr + "]");
 
             if (!logBody || !hasRequestBody) {
 //                logger.log("--> END " + request.method());
@@ -195,6 +203,7 @@ public class HttpLoggingInterceptor implements Interceptor {
 //                logger.log("");
                 if (isPlaintext(buffer)) {
 //                    logger.log(buffer.readString(charset));
+                    assert charset != null;
                     LogUtil.i("请求参数：" + buffer.readString(charset));
 //                    logger.log("--> END " + request.method()
 //                            + " (" + requestBody.contentLength() + "-byte body)");
@@ -217,6 +226,7 @@ public class HttpLoggingInterceptor implements Interceptor {
         long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNs);
 
         ResponseBody responseBody = response.body();
+        assert responseBody != null;
         long contentLength = responseBody.contentLength();
         String bodySize = contentLength != -1 ? contentLength + "-byte" : "unknown-length";
 //        logger.log("<-- " + response.code() + ' ' + response.message() + ' '
@@ -231,10 +241,17 @@ public class HttpLoggingInterceptor implements Interceptor {
 
         if (logHeaders) {
             Headers headers = response.headers();
+            String headerStr = "";
             for (int i = 0, count = headers.size(); i < count; i++) {
 //                logger.log(headers.name(i) + ": " + headers.value(i));
-                LogUtil.i("请求头：" + headers.name(i) + ": " + headers.value(i));
+                if (i == 0) {
+                    headerStr = headers.name(i) + ": " + headers.value(i);
+                } else {
+                    headerStr = headerStr + "," + headers.name(i) + ": " + headers.value(i);
+                }
+
             }
+            LogUtil.i("请求头：[" + headerStr + "]");
 
             if (!logBody || !HttpHeaders.hasBody(response)) {
 //                logger.log("<-- END HTTP");
@@ -267,8 +284,9 @@ public class HttpLoggingInterceptor implements Interceptor {
 
                 if (contentLength != 0) {
 //                    logger.log("");
-                    logger.log(buffer.clone().readString(charset));
-                    LogUtil.i("请求返回数据：" + buffer.clone().readString(charset));
+//                    logger.log(buffer.clone().readString(charset));
+                    assert charset != null;
+                    LogUtil.I("请求返回数据：" + buffer.clone().readString(charset));
                 }
 
 //                logger.log("<-- END HTTP (" + buffer.size() + "-byte body)");

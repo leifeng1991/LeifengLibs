@@ -8,23 +8,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.leifeng.lib.base.BaseActivity;
-import com.leifeng.lib.glide.GlideApp;
 import com.leifeng.lib.net.BaseBean;
 import com.leifeng.lib.net.BaseObserver;
 import com.leifeng.lib.net.RetrofitFactory;
 import com.leifeng.lib.net.RetrofitUtils;
 import com.leifeng.lib.recyclerview.BaseAdapter;
 import com.leifeng.lib.recyclerview.BaseViewHolder;
-import com.leifeng.lib.recyclerview.ItemViewDelegate;
-import com.leifeng.lib.utils.LogUtil;
 import com.leifeng.lib.utils.PermissionHelper;
 import com.leifeng.lib.weight.RefreshLoadView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
 
@@ -53,8 +45,10 @@ public class MainActivity extends BaseActivity {
         mRecyclerView.setItemAnimator(new SlideInRightAnimator());
         adapter = new MyAdapter(getApplicationContext(), R.layout.adapter_list_item);
         mRecyclerView.setAdapter(adapter);
+        mSmartRefreshLayout.autoRefresh();
         mSmartRefreshLayout.setEnableRefresh(true);
         mSmartRefreshLayout.setEnableLoadMore(true);
+        // 权限申请
         mHelper = new PermissionHelper(this);
         mHelper.requestPermissions("请授予[位置]权限", new PermissionHelper.PermissionListener() {
                     @Override
@@ -105,15 +99,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void setListener() {
-
     }
 
     @Override
     protected void loadData() {
-
-//        EmptyWrapper emptyWrapper = new EmptyWrapper(adapter);
-//        emptyWrapper.setEmptyView("你的布局");
-        adapter.addItemViewDelegate(new ItemViewDelegate<String>() {
+        // 多种样式
+        /*adapter.addItemViewDelegate(new ItemViewDelegate<String>() {
             @Override
             public int getItemViewLayoutId() {
                 return R.layout.adapter_list_item1;
@@ -144,10 +135,11 @@ public class MainActivity extends BaseActivity {
             public void convert(BaseViewHolder holder, String s, int position) {
 
             }
-        });
-        mRefreshLoadView.setLoadingListener(new RefreshLoadView.OnLoadingListener() {
+        });*/
+        // 刷新和加载
+       /* mRefreshLoadView.setLoadingListener(new RefreshLoadView.OnLoadingListener() {
             @Override
-            public void onRefresh(int page) {
+            public void onRefresh() {
                 List<String> list = new ArrayList<>();
                 for (int i = 0; i < 20; i++) {
                     list.add("");
@@ -158,16 +150,16 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            public void onLoadMore(int page) {
+            public void onLoadMore() {
                 List<String> list = new ArrayList<>();
                 for (int i = 0; i < 10; i++) {
                     list.add("");
                 }
                 mRefreshLoadView.handleSuccess(adapter, list);
             }
-        });
+        });*/
         // 网络请求
-        RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getUser("2222332"), new BaseObserver<UserBean>(mActivity) {
+       /* RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getUser("2222332"), new BaseObserver<UserBean>(mActivity) {
             @Override
             public void onSuccess(UserBean bean) {
                 List<UserBean.DataBean> data = bean.getData();
@@ -180,22 +172,64 @@ public class MainActivity extends BaseActivity {
             public void onFailed(BaseBean bean) {
 
             }
+        });*/
+       /* mRefreshLoadView.requestNet(RetrofitFactory.getInstance().getAPI().getUser("2222332"), new BaseObserver<UserBean>(mContext) {
+            @Override
+            public void onSuccess(UserBean userBean) {
+                mRefreshLoadView.handleSuccess(adapter, userBean.getData());
+            }
+
+            @Override
+            public void onFailed(BaseBean bean) {
+                mRefreshLoadView.handleFail();
+            }
+        }); */
+
+        mRefreshLoadView.setLoadingListener(new RefreshLoadView.OnLoadingListener() {
+            @Override
+            public void onRefresh() {
+                getData();
+            }
+
+            @Override
+            public void onLoadMore() {
+                getData();
+            }
         });
 
     }
 
-    class MyAdapter extends BaseAdapter<String> {
+    private void getData() {
+        RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getOrderShouyin(
+                mRefreshLoadView.getPage() + "", "2222332", "1522722440", "1514946450"), new BaseObserver<OnLineOrderListBean>(mContext) {
+            @Override
+            public void onSuccess(OnLineOrderListBean onLineOrderListBean) {
+                mRefreshLoadView.handleSuccess(adapter, onLineOrderListBean.getData());
+            }
+
+            @Override
+            public void onFailed(BaseBean bean) {
+                mRefreshLoadView.handleFail();
+            }
+        });
+    }
+
+    class MyAdapter extends BaseAdapter<OnLineOrderListBean.DataBean> {
 
         public MyAdapter(Context context, int layoutId) {
             super(context, layoutId);
         }
 
         @Override
-        protected void convert(BaseViewHolder holder, String s, int position) {
+        protected void convert(BaseViewHolder holder, OnLineOrderListBean.DataBean dataBean, int position) {
             holder.getConvertView().setBackgroundColor(ContextCompat.getColor(mContext, position % 2 == 0 ? R.color.colorAccent : R.color.colorPrimaryDark));
+
         }
     }
 
+    /**
+     * 使用PermissionHelper进行权限请求时加上
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         mHelper.handleRequestPermissionsResult(requestCode, permissions, grantResults);

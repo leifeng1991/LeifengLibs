@@ -29,8 +29,8 @@ public class RefreshLoadView extends RelativeLayout {
     private RecyclerView mRecyclerView;
     private BaseAdapter adapter;
     private OnLoadingListener loadingListener;
-    public int page = 1;
-    public int loadSize = 20;
+    private int page = 1;
+    private int loadSize = 20;
 
     public RefreshLoadView(Context context) {
         this(context, null);
@@ -72,7 +72,7 @@ public class RefreshLoadView extends RelativeLayout {
                             // 设置有更多数据
                             mSmartRefreshLayout.setNoMoreData(false);
                             if (loadingListener != null)
-                                loadingListener.onRefresh(page);
+                                loadingListener.onRefresh();
                         }
                     }, 2000);
 
@@ -87,7 +87,7 @@ public class RefreshLoadView extends RelativeLayout {
                                 // 页数
                                 page = adapter.getItemCount() / loadSize + 1;
                                 if (loadingListener != null)
-                                    loadingListener.onLoadMore(page);
+                                    loadingListener.onLoadMore();
                             }
                         }
                     }, 2000);
@@ -122,9 +122,10 @@ public class RefreshLoadView extends RelativeLayout {
             mLoadingLayout.showContent();
             // 添加数据
             adapter.addList(list);
-            // 加载完成
-            mSmartRefreshLayout.finishLoadMore(0, true, list != null && list.size() < 20);
         }
+
+        // 加载完成
+        mSmartRefreshLayout.finishLoadMore(0, true, list != null && list.size() < loadSize);
     }
 
     /**
@@ -141,7 +142,7 @@ public class RefreshLoadView extends RelativeLayout {
                     // 重新刷新数据
                     page = 1;
                     if (loadingListener != null)
-                        loadingListener.onRefresh(page);
+                        loadingListener.onRefresh();
                 }
             });
         } else {
@@ -187,16 +188,26 @@ public class RefreshLoadView extends RelativeLayout {
     public interface OnLoadingListener {
         /**
          * 刷新
-         *
-         * @param page 分页
          */
-        void onRefresh(int page);
+        void onRefresh();
 
         /**
          * 加载
-         *
-         * @param page 分页
          */
-        void onLoadMore(int page);
+        void onLoadMore();
+    }
+
+    /**
+     * 获取分页
+     */
+    public int getPage() {
+        return page;
+    }
+
+    /**
+     * 设置分页
+     */
+    public void setPage(int page) {
+        this.page = page;
     }
 }

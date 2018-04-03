@@ -2,8 +2,6 @@ package com.leifeng.lib.net;
 
 import android.support.annotation.NonNull;
 
-import com.leifeng.lib.utils.LogUtil;
-
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -17,7 +15,6 @@ import okhttp3.Response;
  * 2018/3/21 16:39
  */
 class InterceptorUtil {
-    private static String TAG = "请求";
 
     /**
      * 日志拦截器
