@@ -10,7 +10,8 @@ package com.leifeng.lib.constants;
 
 public interface BaseConstants {
     interface S {
-
+        String TITLE = "title";
+        String URL = "url";
     }
 
     interface I {

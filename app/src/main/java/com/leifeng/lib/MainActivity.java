@@ -2,12 +2,16 @@ package com.leifeng.lib;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.LinearLayout;
 
+import com.just.agentweb.AgentWeb;
 import com.leifeng.lib.base.BaseActivity;
+import com.leifeng.lib.base.BaseWebActivity;
 import com.leifeng.lib.glide.GlideImageLoader;
 import com.leifeng.lib.net.BaseObserver;
 import com.leifeng.lib.net.RetrofitFactory;
@@ -15,6 +19,7 @@ import com.leifeng.lib.net.RetrofitUtils;
 import com.leifeng.lib.recyclerview.BaseAdapter;
 import com.leifeng.lib.recyclerview.BaseViewHolder;
 import com.leifeng.lib.recyclerview.HeaderAndFooterWrapper;
+import com.leifeng.lib.recyclerview.ItemViewDelegate;
 import com.leifeng.lib.recyclerview.MultiItemTypeAdapter;
 import com.leifeng.lib.utils.PermissionHelper;
 import com.leifeng.lib.utils.StatusBarUtil;
@@ -49,7 +54,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mHeaderView = getLayoutInflater().inflate(R.layout.view_header,null);
+        mHeaderView = getLayoutInflater().inflate(R.layout.view_header, null);
         mBanner = mHeaderView.findViewById(R.id.banner);
         mRefreshLoadView = findViewById(R.id.id_refresh_recycler_view);
         mRecyclerView = mRefreshLoadView.getRecyclerView();
@@ -139,7 +144,8 @@ public class MainActivity extends BaseActivity {
         adapter.setOnItemClickListener(new MultiItemTypeAdapter.OnItemClickListener<OnLineOrderListBean.DataBean>() {
             @Override
             public void onItemClick(View view, RecyclerView.ViewHolder holder, OnLineOrderListBean.DataBean dataBean, int position) {
-//                ToastUtils.showShortToast(mContext,dataBean.getId());
+                /********************************WebView**************************************/
+                startActivity(BaseWebActivity.newIntent(mContext,"详情","https://www.baidu.com/"));
             }
 
             @Override
@@ -157,38 +163,38 @@ public class MainActivity extends BaseActivity {
         mRecyclerView.setAdapter(mHeaderAndFooterWrapper);
 
         /*************************多种样式adapter**************************************/
-        /*adapter.addItemViewDelegate(new ItemViewDelegate<String>() {
+        adapter.addItemViewDelegate(new ItemViewDelegate<OnLineOrderListBean.DataBean>() {
             @Override
             public int getItemViewLayoutId() {
                 return R.layout.adapter_list_item1;
             }
 
             @Override
-            public boolean isForViewType(String item, int position) {
+            public boolean isForViewType(OnLineOrderListBean.DataBean item, int position) {
                 return position % 3 == 1;
             }
 
             @Override
-            public void convert(BaseViewHolder holder, String s, int position) {
+            public void convert(BaseViewHolder holder, OnLineOrderListBean.DataBean s, int position) {
 
             }
         });
-        adapter.addItemViewDelegate(new ItemViewDelegate<String>() {
+        adapter.addItemViewDelegate(new ItemViewDelegate<OnLineOrderListBean.DataBean>() {
             @Override
             public int getItemViewLayoutId() {
                 return R.layout.adapter_list_item2;
             }
 
             @Override
-            public boolean isForViewType(String item, int position) {
+            public boolean isForViewType(OnLineOrderListBean.DataBean item, int position) {
                 return position % 3 == 2;
             }
 
             @Override
-            public void convert(BaseViewHolder holder, String s, int position) {
+            public void convert(BaseViewHolder holder, OnLineOrderListBean.DataBean s, int position) {
 
             }
-        });*/
+        });
         // 刷新和加载
        /* mRefreshLoadView.setLoadingListener(new RefreshLoadView.OnLoadingListener() {
             @Override
