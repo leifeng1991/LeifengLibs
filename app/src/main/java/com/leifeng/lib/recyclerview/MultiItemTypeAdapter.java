@@ -12,7 +12,7 @@ import java.util.List;
  * 描述:
  *
  * @author leifeng
- *         2018/3/14 10:10
+ * 2018/3/14 10:10
  */
 
 
@@ -65,7 +65,7 @@ public class MultiItemTypeAdapter<T> extends RecyclerView.Adapter<BaseViewHolder
             public void onClick(View v) {
                 if (mOnItemClickListener != null) {
                     int position = viewHolder.getAdapterPosition();
-                    mOnItemClickListener.onItemClick(v, viewHolder, position);
+                    mOnItemClickListener.onItemClick(v, viewHolder, mDatas.get(position), position);
                 }
             }
         });
@@ -75,7 +75,7 @@ public class MultiItemTypeAdapter<T> extends RecyclerView.Adapter<BaseViewHolder
             public boolean onLongClick(View v) {
                 if (mOnItemClickListener != null) {
                     int position = viewHolder.getAdapterPosition();
-                    return mOnItemClickListener.onItemLongClick(v, viewHolder, position);
+                    return mOnItemClickListener.onItemLongClick(v, viewHolder, mDatas.get(position), position);
                 }
                 return false;
             }
@@ -153,13 +153,13 @@ public class MultiItemTypeAdapter<T> extends RecyclerView.Adapter<BaseViewHolder
         return mItemViewDelegateManager.getItemViewDelegateCount() > 0;
     }
 
-    public interface OnItemClickListener {
-        void onItemClick(View view, RecyclerView.ViewHolder holder, int position);
+    public interface OnItemClickListener<T> {
+        void onItemClick(View view, RecyclerView.ViewHolder holder, T t, int position);
 
-        boolean onItemLongClick(View view, RecyclerView.ViewHolder holder, int position);
+        boolean onItemLongClick(View view, RecyclerView.ViewHolder holder, T t, int position);
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListener<T> onItemClickListener) {
         this.mOnItemClickListener = onItemClickListener;
     }
 }

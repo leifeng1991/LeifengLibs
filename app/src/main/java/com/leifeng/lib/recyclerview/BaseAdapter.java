@@ -44,4 +44,9 @@ public abstract class BaseAdapter<T> extends MultiItemTypeAdapter<T> {
     }
 
     protected abstract void convert(BaseViewHolder holder, T t, int position);
+
+    @Override
+    public void setOnItemClickListener(OnItemClickListener<T> onItemClickListener) {
+        super.setOnItemClickListener(onItemClickListener);
+    }
 }

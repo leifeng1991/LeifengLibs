@@ -3,12 +3,15 @@ package com.leifeng.lib.base;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.leifeng.lib.R;
+import com.leifeng.lib.utils.PermissionHelper;
+import com.leifeng.lib.utils.StatusBarUtil;
 
 /**
  * 描述:基础Activity
@@ -26,6 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
     protected Activity mActivity;
     protected Context mContext;
     protected String TAG;
+    protected PermissionHelper mHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +37,17 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         mActivity = this;
         mContext = this.getApplicationContext();
         TAG = getPackageName().getClass().getSimpleName();
+        init();
         loadViewLayout();
         initView();
+        setStatusBar();
         initData();
         setListener();
         loadData();
+    }
+
+    private void init(){
+        mHelper = new PermissionHelper(this);
     }
 
     /**
@@ -151,6 +161,11 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
         return true;
     }
 
+    protected void setStatusBar() {
+        StatusBarUtil.setColor(this, getResources().getColor(R.color.colorPrimary));
+    }
+
+
     @Override
     public void onClick(View v) {
         if (isFastClick())
@@ -163,5 +178,13 @@ public abstract class BaseActivity extends AppCompatActivity implements View.OnC
                 setOnRightClickListener();
                 break;
         }
+    }
+
+    /**
+     * 使用PermissionHelper进行权限请求时加上
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        mHelper.handleRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

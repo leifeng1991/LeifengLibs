@@ -1,4 +1,4 @@
-package com.leifeng.lib.recyclerview.wrapper;
+package com.leifeng.lib.recyclerview;
 
 import android.support.v4.util.SparseArrayCompat;
 import android.support.v7.widget.GridLayoutManager;

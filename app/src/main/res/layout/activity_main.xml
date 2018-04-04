@@ -7,6 +7,7 @@
     <com.leifeng.lib.weight.RefreshLoadView
         android:id="@+id/id_refresh_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"/>
 
 </LinearLayout>

@@ -50,6 +50,7 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
         onError();
         LogUtil.e("==============onError");
         String errorMsg;
+        int code = -1;
         if (e instanceof IOException) {
             // 没有网络
             errorMsg = "请检查你的网络";
@@ -60,16 +61,15 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
             // 网络正常，http 请求成功，服务器返回逻辑错误
             errorMsg = e.getMessage();
             // 封装code 和 message
-            BaseBean baseBean = new BaseBean();
-            baseBean.setCode(((APIException) e).getErrorCode());
-            baseBean.setMessage(errorMsg);
-            onFailed(baseBean);
+            code = ((APIException) e).getErrorCode();
         } else {
             // 其他未知错误
             errorMsg = !TextUtils.isEmpty(e.getMessage()) ? e.getMessage() : "unknown error";
         }
-        // 吐司提示
-        ToastUtils.showShortToast(mContext, errorMsg);
+        BaseBean baseBean = new BaseBean();
+        baseBean.setCode(code);
+        baseBean.setMessage(errorMsg);
+        onFailed((T) baseBean);
 
     }
 
@@ -86,9 +86,12 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
     public abstract void onSuccess(T t);
 
     /**
-     * 网络正常回调
+     * 失败回调并吐司
      */
-    public abstract void onFailed(BaseBean bean);
+    public void onFailed(T t){
+        // 吐司提示
+        ToastUtils.showShortToast(mContext, t.getMessage());
+    }
 
     /**
      * 不管网络正常与否都回调
