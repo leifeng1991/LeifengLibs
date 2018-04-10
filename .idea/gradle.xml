@@ -8,7 +8,11 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/base_libs" />
+            <option value="$PROJECT_DIR$/module_app" />
+            <option value="$PROJECT_DIR$/module_leifeng" />
+            <option value="$PROJECT_DIR$/module_main" />
+            <option value="$PROJECT_DIR$/module_news" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -1,0 +1,97 @@
+if (isModel.toBoolean()) {
+    // app
+    apply plugin: 'com.android.application'
+} else {
+    // library
+    apply plugin: 'com.android.library'
+}
+
+android {
+    compileSdkVersion build_versions.target_sdk
+    defaultConfig {
+        if (isModel.toBoolean()) {
+            applicationId "com.leifeng.lib"
+        }
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode build_versions.version_code
+        versionName build_versions.version_name
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ moduleName : project.getName() ]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main {
+            if (isModel.toBoolean()) {
+                // app
+                manifest.srcFile 'src\\main\\AndroidManifest.xml'
+            } else {
+                // library
+                manifest.srcFile 'src\\main\\java\\com\\leifeng\\lib\\manifest\\AndroidManifest.xml'
+            }
+
+        }
+    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    api deps.support.app_compat
+    api deps.support.recyclerview
+    api deps.support.cardview
+    api deps.support.design
+    api deps.support.multidex
+    api deps.constraint_layout
+    // recycler_view动画
+    api deps.animators
+    // 下拉刷新 上拉加载
+    api deps.smart_refreshLayout
+    //没有使用特殊Header，可以不加这行
+    api deps.smart_refreshLayout_header
+    // 内存泄漏检测
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    // 图片加载
+    api deps.glide
+    annotationProcessor deps.dagger.glide_compiler
+    // Gson
+    api deps.retrofit.converter_gson
+    // 网络请求
+    api deps.okhttp3
+    // HTTP Client
+    api deps.retrofit.runtime
+    // rxjava
+    api deps.rxjava2
+    api deps.retrofit.adapter
+    // rxandroid
+    api deps.rx_android
+    // banner
+    api deps.banner
+    // tablayout
+    api deps.tablayout
+    // webview
+    api deps.agentweb // (必选)
+//    api 'com.just.agentweb:download:4.0.2' // (可选)
+//    api 'com.just.agentweb:filechooser:4.0.2'// (可选)
+    // router
+    api deps.arouter_api
+//    annotationProcessor deps.arouter_compiler
+}
