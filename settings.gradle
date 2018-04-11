@@ -1,1 +1,1 @@
-include ':base_libs', ':module_leifeng', ':module_news', ':module_news', ':module_main', ':module_app'
+include ':base_libs', ':module_news', ':module_news', ':module_main', ':module_app'

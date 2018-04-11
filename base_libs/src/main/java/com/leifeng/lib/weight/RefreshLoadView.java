@@ -74,7 +74,7 @@ public class RefreshLoadView extends RelativeLayout {
                             if (loadingListener != null)
                                 loadingListener.onRefresh();
                         }
-                    }, 2000);
+                    }, 0);
 
                 }
 
@@ -90,7 +90,7 @@ public class RefreshLoadView extends RelativeLayout {
                                     loadingListener.onLoadMore();
                             }
                         }
-                    }, 2000);
+                    }, 0);
 
                 }
             });

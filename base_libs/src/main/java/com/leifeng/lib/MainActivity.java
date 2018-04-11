@@ -2,35 +2,31 @@ package com.leifeng.lib;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.LinearLayout;
 
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.just.agentweb.AgentWeb;
-import com.leifeng.lib.base.BaseActivity;
-import com.leifeng.lib.base.BaseWebActivity;
 import com.leifeng.lib.base.PermissionActivity;
 import com.leifeng.lib.glide.GlideImageLoader;
-import com.leifeng.lib.net.BaseObserver;
 import com.leifeng.lib.net.RetrofitFactory;
 import com.leifeng.lib.net.RetrofitUtils;
+import com.leifeng.lib.net.observer.FileDownLoadObserver;
 import com.leifeng.lib.recyclerview.BaseAdapter;
 import com.leifeng.lib.recyclerview.BaseViewHolder;
 import com.leifeng.lib.recyclerview.HeaderAndFooterWrapper;
 import com.leifeng.lib.recyclerview.ItemViewDelegate;
 import com.leifeng.lib.recyclerview.MultiItemTypeAdapter;
+import com.leifeng.lib.utils.LogUtil;
 import com.leifeng.lib.utils.PermissionHelper;
-import com.leifeng.lib.utils.StatusBarUtil;
 import com.leifeng.lib.weight.RefreshLoadView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
 
+import java.io.File;
 import java.util.Arrays;
 
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
@@ -267,8 +263,13 @@ public class MainActivity extends PermissionActivity {
      * 网络请求
      */
     private void getNetData() {
+        /*ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage("数据更新中...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
         RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getOrderShouyin(
-                mRefreshLoadView.getPage() + "", "2222332", "1522722440", "1514946450"), new BaseObserver<OnLineOrderListBean>(mContext) {
+                mRefreshLoadView.getPage() + "", "2222332", "1522722440", "1514946450"), new BaseObserver<OnLineOrderListBean>(mContext, progressDialog) {
             @Override
             public void onSuccess(OnLineOrderListBean onLineOrderListBean) {
                 mRefreshLoadView.handleSuccess(adapter, onLineOrderListBean.getData());
@@ -282,7 +283,26 @@ public class MainActivity extends PermissionActivity {
                 // 有头部或者尾部时必须加上这一行
                 mHeaderAndFooterWrapper.notifyDataSetChanged();
             }
-        });
+        });*/
+
+
+        RetrofitUtils.downLoad(mContext, RetrofitFactory.getInstance().getAPI().downLoadFile("http:\\/\\/imtt.dd.qq.com\\/16891\\/2C61DFB307875A308A12652B9FF9EC78.apk?fsname=com.xxzlkj.zhaolin_1.2.1_9.apk&amp;csr=1bbd")
+                , new FileDownLoadObserver<File>() {
+                    @Override
+                    public void onDownLoadSuccess(File file) {
+                        LogUtil.e("===========下载完成");
+                    }
+
+                    @Override
+                    public void onDownLoadFail(Throwable throwable) {
+                        LogUtil.e("===========下载出错");
+                    }
+
+                    @Override
+                    public void onProgress(int progress, long total) {
+                        LogUtil.e("===========大小" + total + "==百分比" + progress);
+                    }
+                });
     }
 
     /*********************************adapter***********************************/

@@ -14,7 +14,7 @@ import io.reactivex.schedulers.Schedulers;
  * 描述:在IO线程进行请求，在主线程进行回调
  *
  * @author leifeng
- *         2018/3/21 17:20
+ * 2018/3/21 17:20
  */
 
 

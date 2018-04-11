@@ -3,10 +3,16 @@ package com.leifeng.lib.net;
 
 import com.leifeng.lib.constants.BaseConstants;
 import com.leifeng.lib.constants.BaseURLConstant;
+import com.leifeng.lib.net.interceptor.InterceptorUtil;
+import com.leifeng.lib.net.interceptor.ReadCookiesInterceptor;
+import com.leifeng.lib.net.interceptor.SaveCookiesInterceptor;
+import com.leifeng.lib.net.observer.FileDownLoadObserver;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.annotations.NonNull;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -63,5 +69,35 @@ public class RetrofitFactory {
         return mBaseAPI;
     }
 
+
+    /**
+     * 下载单文件，该方法不支持断点下载
+     *
+     * @param url                  文件地址
+     * @param destDir              存储文件夹
+     * @param fileName             存储文件名
+     * @param fileDownLoadObserver 监听回调
+     */
+    public void downloadFile(@NonNull String url, final String destDir, final String fileName, final FileDownLoadObserver<File> fileDownLoadObserver) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(new OkHttpClient())
+                .baseUrl(BaseURLConstant.BASE_URL)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+      /*  retrofit.create(BaseAPI.class)
+                .downLoadFile(url)
+                .subscribeOn(Schedulers.io())//subscribeOn和ObserOn必须在io线程，如果在主线程会出错
+                .observeOn(Schedulers.io())
+                .observeOn(Schedulers.computation())//需要
+                .map(new Function<ResponseBody, File>() {
+                    @Override
+                    public File apply(@NonNull ResponseBody responseBody) throws Exception {
+                        return fileDownLoadObserver.saveFile(responseBody, destDir, fileName);
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(fileDownLoadObserver);*/
+    }
 
 }

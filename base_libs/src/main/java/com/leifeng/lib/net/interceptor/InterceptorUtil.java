@@ -1,6 +1,8 @@
-package com.leifeng.lib.net;
+package com.leifeng.lib.net.interceptor;
 
 import android.support.annotation.NonNull;
+
+import com.leifeng.lib.net.interceptor.HttpLoggingInterceptor;
 
 import java.io.IOException;
 

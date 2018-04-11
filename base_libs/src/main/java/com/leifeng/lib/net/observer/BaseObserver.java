@@ -1,9 +1,14 @@
-package com.leifeng.lib.net;
+package com.leifeng.lib.net.observer;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.text.TextUtils;
 
 
+import com.leifeng.lib.net.APIException;
+import com.leifeng.lib.net.BaseBean;
 import com.leifeng.lib.utils.LogUtil;
 import com.leifeng.lib.utils.ToastUtils;
 
@@ -17,17 +22,35 @@ import retrofit2.HttpException;
  * 描述:观察者
  *
  * @author leifeng
- *         2018/3/21 17:26
+ * 2018/3/21 17:26
  */
 public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
     private Context mContext;
+    private ProgressDialog pd;
+    private Disposable mDisposable;
 
     protected BaseObserver(Context context) {
         this.mContext = context;
     }
 
+    /**
+     * @param pd 加载对话框
+     */
+    protected BaseObserver(Context context, ProgressDialog pd) {
+        this.mContext = context;
+        this.pd = pd;
+        pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                if (mDisposable != null)
+                    mDisposable.dispose();
+            }
+        });
+    }
+
     @Override
     public void onSubscribe(Disposable d) {
+        mDisposable = d;
         LogUtil.e("==============onSubscribe");
     }
 
@@ -42,7 +65,7 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
             onFailed(t);
             onError();
         }
-
+        dismiss();
     }
 
     @Override
@@ -70,11 +93,13 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
         baseBean.setCode(code);
         baseBean.setMessage(errorMsg);
         onFailed((T) baseBean);
+        dismiss();
 
     }
 
     @Override
     public void onComplete() {
+        dismiss();
         LogUtil.e("==============onComplete");
     }
 
@@ -88,7 +113,7 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
     /**
      * 失败回调并吐司
      */
-    public void onFailed(T t){
+    public void onFailed(T t) {
         // 吐司提示
         ToastUtils.showShortToast(mContext, t.getMessage());
     }
@@ -98,5 +123,22 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
      */
     public void onError() {
 
+    }
+
+    public void setProgressDialog(ProgressDialog pd){
+        this.pd = pd;
+        pd.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                if (mDisposable != null)
+                    mDisposable.dispose();
+            }
+        });
+    }
+
+    private void dismiss(){
+        if (pd != null && pd.isShowing()){
+            pd.dismiss();
+        }
     }
 }

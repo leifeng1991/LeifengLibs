@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.annotations.NonNull;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -21,6 +23,8 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
+import retrofit2.http.Streaming;
+import retrofit2.http.Url;
 
 /**
  * 描述:API
@@ -78,4 +82,10 @@ public interface BaseAPI {
     @POST("orderShouyin")
     Observable<OnLineOrderListBean> getOrderShouyin(@Field("page") String page, @Field("store_id") String store_id, @Field("stoptime") String stoptime, @Field("starttime") String starttime);
 
+    /**
+     * @Streaming 注解可用于下载大文件
+     */
+    @Streaming
+    @GET
+    Observable<ResponseBody> downLoadFile(@NonNull @Url String url);
 }
