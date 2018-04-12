@@ -2,8 +2,6 @@ package com.leifeng.lib.net.interceptor;
 
 import android.support.annotation.NonNull;
 
-import com.leifeng.lib.net.interceptor.HttpLoggingInterceptor;
-
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -16,12 +14,12 @@ import okhttp3.Response;
  * @author leifeng
  * 2018/3/21 16:39
  */
-class InterceptorUtil {
+public class InterceptorUtil {
 
     /**
      * 日志拦截器
      */
-    static HttpLoggingInterceptor LogInterceptor() {
+    public static HttpLoggingInterceptor LogInterceptor() {
         return new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override
             public void log(String message) {
@@ -32,7 +30,7 @@ class InterceptorUtil {
     /**
      * header拦截器
      */
-    static Interceptor HeaderInterceptor() {
+    public static Interceptor HeaderInterceptor() {
         return new Interceptor() {
             @Override
             public Response intercept(@NonNull Chain chain) throws IOException {
