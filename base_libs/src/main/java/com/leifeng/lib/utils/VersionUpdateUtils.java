@@ -70,7 +70,9 @@ public class VersionUpdateUtils {
             @Override
             public void onDownloadSuccess(File file) {
                 LogUtil.e("===========下载完成");
+                // 关闭对话框
                 progressDialog.dismiss();
+                // 提示
                 ToastUtils.showShortToast(activity.getApplicationContext(), "下载完成");
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     // 请求安装权限
@@ -88,8 +90,10 @@ public class VersionUpdateUtils {
 
             @Override
             public void onDownloadFailed() {
+                // 关闭对话框
                 progressDialog.dismiss();
                 LogUtil.e("===========下载出错");
+                // 提示
                 ToastUtils.showShortToast(activity.getApplicationContext(), "下载出错");
             }
         });
@@ -110,6 +114,7 @@ public class VersionUpdateUtils {
         final NotificationManager manager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
         // 适配安卓8.0的消息渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // 此id必须与下面id一致
             builder.setChannelId("1");
             NotificationChannel channel = new NotificationChannel("1", "channel", NotificationManager.IMPORTANCE_HIGH);
             if (manager != null) {

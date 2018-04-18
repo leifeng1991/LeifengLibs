@@ -2,30 +2,47 @@ package com.leifeng.lib;
 
 import android.Manifest;
 import android.content.Context;
+import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
+import android.widget.TextView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.leifeng.lib.base.PermissionActivity;
 import com.leifeng.lib.glide.GlideImageLoader;
+import com.leifeng.lib.net.RetrofitFactory;
+import com.leifeng.lib.net.RetrofitUtils;
+import com.leifeng.lib.net.observer.BaseObserver;
 import com.leifeng.lib.recyclerview.BaseAdapter;
 import com.leifeng.lib.recyclerview.BaseViewHolder;
+import com.leifeng.lib.recyclerview.GridDividerItemDecoration;
 import com.leifeng.lib.recyclerview.HeaderAndFooterWrapper;
 import com.leifeng.lib.recyclerview.ItemViewDelegate;
 import com.leifeng.lib.recyclerview.MultiItemTypeAdapter;
+import com.leifeng.lib.utils.LogUtil;
 import com.leifeng.lib.utils.PermissionHelper;
-import com.leifeng.lib.utils.VersionUpdateUtils;
 import com.leifeng.lib.weight.RefreshLoadView;
 import com.scwang.smartrefresh.layout.SmartRefreshLayout;
 import com.youth.banner.Banner;
 import com.youth.banner.BannerConfig;
 import com.youth.banner.Transformer;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.ShortBuffer;
 import java.util.Arrays;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator;
+
+import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 
 public class MainActivity extends PermissionActivity {
     private View mHeaderView;
@@ -35,6 +52,7 @@ public class MainActivity extends PermissionActivity {
     private SmartRefreshLayout mSmartRefreshLayout;
     private MyAdapter adapter;
     private HeaderAndFooterWrapper mHeaderAndFooterWrapper;
+    private GLSurfaceView mGlSurfaceView;
 
     @Override
     protected void loadViewLayout() {
@@ -48,6 +66,7 @@ public class MainActivity extends PermissionActivity {
         mRefreshLoadView = findViewById(R.id.id_refresh_recycler_view);
         mRecyclerView = mRefreshLoadView.getRecyclerView();
         mSmartRefreshLayout = mRefreshLoadView.getSmartRefreshLayout();
+        mGlSurfaceView = findViewById(R.id.id_gl_surface_view);
     }
 
     @Override
@@ -73,7 +92,12 @@ public class MainActivity extends PermissionActivity {
         //banner设置方法全部调用完毕时最后调用
         mBanner.start();
         /***************************RefreshLoadView*******************************/
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,false));
+//        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext, 3, GridLayoutManager.HORIZONTAL, false));
+        GridDividerItemDecoration gridDividerItemDecoration = new GridDividerItemDecoration(mContext);
+        gridDividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.shape_divider));
+        mRecyclerView.addItemDecoration(gridDividerItemDecoration);
         mRecyclerView.setItemAnimator(new SlideInRightAnimator());
         adapter = new MyAdapter(getApplicationContext(), R.layout.adapter_list_item);
 //        mRecyclerView.setAdapter(adapter);
@@ -126,7 +150,12 @@ public class MainActivity extends PermissionActivity {
                 }
             });
         }*/
-
+        // 设置OpenGL版本(一定要设置)
+        mGlSurfaceView.setEGLContextClientVersion(2);
+        // 设置渲染器
+        mGlSurfaceView.setRenderer(new MyRenderer());
+        // 设置渲染模式
+        mGlSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
     @Override
@@ -152,7 +181,7 @@ public class MainActivity extends PermissionActivity {
     protected void loadData() {
         /********************************adapter添加头部和尾部**************************************/
         mHeaderAndFooterWrapper = new HeaderAndFooterWrapper(adapter);
-        mHeaderAndFooterWrapper.addHeaderView(mHeaderView);
+//        mHeaderAndFooterWrapper.addHeaderView(mHeaderView);
         mRecyclerView.setAdapter(mHeaderAndFooterWrapper);
 
         /*************************多种样式adapter**************************************/
@@ -169,7 +198,8 @@ public class MainActivity extends PermissionActivity {
 
             @Override
             public void convert(BaseViewHolder holder, OnLineOrderListBean.DataBean s, int position) {
-
+                TextView textView = holder.itemView.findViewById(R.id.id_text);
+                textView.setText(position + "");
             }
         });
         adapter.addItemViewDelegate(new ItemViewDelegate<OnLineOrderListBean.DataBean>() {
@@ -185,7 +215,8 @@ public class MainActivity extends PermissionActivity {
 
             @Override
             public void convert(BaseViewHolder holder, OnLineOrderListBean.DataBean s, int position) {
-
+                TextView textView = holder.itemView.findViewById(R.id.id_text);
+                textView.setText(position + "");
             }
         });
         // 刷新和加载
@@ -242,6 +273,18 @@ public class MainActivity extends PermissionActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGlSurfaceView.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mGlSurfaceView.onPause();
+    }
+
     //如果你需要考虑更好的体验，可以这么操作
     @Override
     protected void onStart() {
@@ -262,7 +305,7 @@ public class MainActivity extends PermissionActivity {
      */
     private void getNetData() {
 
-       /* RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getOrderShouyin(
+        RetrofitUtils.httRequest(RetrofitFactory.getInstance().getAPI().getOrderShouyin(
                 mRefreshLoadView.getPage() + "", "2222332", "1522722440", "1514946450"), new BaseObserver<OnLineOrderListBean>(mContext) {
             @Override
             public void onSuccess(OnLineOrderListBean onLineOrderListBean) {
@@ -277,10 +320,10 @@ public class MainActivity extends PermissionActivity {
                 // 有头部或者尾部时必须加上这一行
                 mHeaderAndFooterWrapper.notifyDataSetChanged();
             }
-        });*/
+        });
 
 
-        VersionUpdateUtils.requestStoragePermission(mActivity, mHelper, "http:\\/\\/imtt.dd.qq.com\\/16891\\/2C61DFB307875A308A12652B9FF9EC78.apk?fsname=com.xxzlkj.zhaolin_1.2.1_9.apk&amp;csr=1bbd", 0);
+//        VersionUpdateUtils.requestStoragePermission(mActivity, mHelper, "http:\\/\\/imtt.dd.qq.com\\/16891\\/2C61DFB307875A308A12652B9FF9EC78.apk?fsname=com.xxzlkj.zhaolin_1.2.1_9.apk&amp;csr=1bbd", 0);
 
        /* RetrofitUtils.downLoad(mContext, RetrofitFactory.getInstance().getAPI().downLoadFile("http:\\/\\/imtt.dd.qq.com\\/16891\\/2C61DFB307875A308A12652B9FF9EC78.apk?fsname=com.xxzlkj.zhaolin_1.2.1_9.apk&amp;csr=1bbd")
                 , new FileDownLoadObserver<File>() {
@@ -312,8 +355,192 @@ public class MainActivity extends PermissionActivity {
         @Override
         protected void convert(BaseViewHolder holder, OnLineOrderListBean.DataBean dataBean, int position) {
             holder.getConvertView().setBackgroundColor(ContextCompat.getColor(mContext, position % 2 == 0 ? R.color.colorAccent : R.color.colorPrimaryDark));
-
+            TextView textView = holder.itemView.findViewById(R.id.id_text);
+            textView.setText(position + "");
         }
     }
+
+    public class MyRenderer implements GLSurfaceView.Renderer {
+        // 顶点着色器的脚本
+       /* private static final String VERTEX_SHADER =
+                "attribute vec4 vPosition;\n"
+                        + "void main() {\n"
+                        + " gl_Position = vPosition;\n"
+                        + "}";*/
+        // 片元着色器的脚本
+        private static final String FRAGMENT_SHADER
+                = "precision mediump float;         \n" // 声明float类型的精度为中等(精度越高越耗资源)
+                + "uniform vec4 uColor;             \n" // uniform的属性uColor
+                + "void main(){                     \n"
+                + "   gl_FragColor = uColor;        \n" // 给此片元的填充色
+                + "}";
+        private static final String VERTEX_SHADER =
+                "attribute vec4 vPosition;\n"
+                        + "uniform mat4 uMVPMatrix;\n"
+                        + "void main() {\n"
+                        + " gl_Position = uMVPMatrix * vPosition;\n"
+                        + "}";
+        private int program;
+        private int vPosition;
+        private int uColor;
+        private int mMatrixHandle;
+        private final float[] mMVPMatrix = new float[16];
+        private final short[] VERTEX_INDEX = {0, 1, 2, 0, 2, 3};
+        private final ShortBuffer mVertexIndexBuffer;
+
+        public MyRenderer() {
+            mVertexIndexBuffer = ByteBuffer.allocateDirect(VERTEX_INDEX.length * 2)
+                    .order(ByteOrder.nativeOrder())
+                    .asShortBuffer()
+                    .put(VERTEX_INDEX);
+            mVertexIndexBuffer.position(0);
+        }
+
+        @Override
+        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+            // 设置clear color颜色RGBA(这里仅仅是设置清屏时GLES20.glClear()用的颜色值而不是执行清屏)
+            GLES20.glClearColor(1.0f, 0, 0, 0);
+            // 初始化着色器
+            // 基于顶点着色器与片元着色器创建程序
+            program = createProgram(VERTEX_SHADER, FRAGMENT_SHADER);
+            // 获取着色器中的属性引用id(传入的字符串就是我们着色器脚本中的属性名)
+            vPosition = GLES20.glGetAttribLocation(program, "vPosition");
+            uColor = GLES20.glGetUniformLocation(program, "uColor");
+            mMatrixHandle = GLES20.glGetUniformLocation(program, "uMVPMatrix");
+            GLES20.glEnableVertexAttribArray(vPosition);
+
+            // 获取图形的顶点坐标
+            FloatBuffer mVertexBuffer = getVertices();
+            // 为画笔指定顶点位置数据(vPosition)
+            GLES20.glVertexAttribPointer(vPosition, 3, GLES20.GL_FLOAT, false,
+                    12, mVertexBuffer);
+
+        }
+
+        @Override
+        public void onSurfaceChanged(GL10 gl, int width, int height) {
+            // 设置绘图的窗口(可以理解成在画布上划出一块区域来画图)
+            GLES20.glViewport(0, 0, width, height);
+            Matrix.perspectiveM(mMVPMatrix, 0, 45, (float) width / height, 0.1f, 100f);
+            Matrix.translateM(mMVPMatrix, 0, 0f, 0f, -2.5f);
+        }
+
+        @Override
+        public void onDrawFrame(GL10 gl) {
+            // 清屏
+            GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+            // 允许顶点位置数据数组
+            GLES20.glEnableVertexAttribArray(vPosition);
+            // 设置属性uColor(颜色 索引,R,G,B,A)
+            GLES20.glUniform4f(uColor, 0.0f, 1.0f, 0.0f, 1.0f);
+            // 绘制
+//            GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 5);
+            // 禁用指向三角形的顶点数组
+//            GLES20.glDisableVertexAttribArray(vPosition);
+
+            GLES20.glUniformMatrix4fv(mMatrixHandle, 1, false, mMVPMatrix, 0);
+
+//            GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 5);
+            // 用 glDrawElements 来绘制，mVertexIndexBuffer 指定了顶点绘制顺序
+            GLES20.glDrawElements(GLES20.GL_TRIANGLES, VERTEX_INDEX.length,
+                    GLES20.GL_UNSIGNED_SHORT, mVertexIndexBuffer);
+        }
+
+        /**
+         * 创建shader程序的方法
+         */
+        private int createProgram(String vertexSource, String fragmentSource) {
+            //加载顶点着色器
+            int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexSource);
+            if (vertexShader == 0)
+                return 0;
+            // 加载片元着色器
+            int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentSource);
+            if (fragmentShader == 0)
+                return 0;
+            // 创建程序
+            int program = GLES20.glCreateProgram();
+            LogUtil.e("=========program" + program);
+            if (program != 0) {
+                // 创建成功.
+                // 向程序中加入顶点着色器
+                GLES20.glAttachShader(program, vertexShader);
+                // 向程序中加入片元着色器
+                GLES20.glAttachShader(program, fragmentShader);
+                // 链接程序
+                GLES20.glLinkProgram(program);
+                // 使用某套shader程序
+                GLES20.glUseProgram(program);
+                // 存放链接成功program数量的数组
+                int[] linkStatus = new int[1];
+                // 获取program的链接情况
+                GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, linkStatus, 0);
+                if (linkStatus[0] != GLES20.GL_TRUE) {
+                    // 链接失败
+                    LogUtil.e("ES20_ERROR", "Could not link program: ");
+                    LogUtil.e("ES20_ERROR", GLES20.glGetProgramInfoLog(program));
+                    GLES20.glDeleteProgram(program);
+                    program = 0;
+                }
+            }
+            return program;
+
+        }
+
+        /**
+         * 加载制定shader的方法
+         *
+         * @param shaderType shader的类型  GLES20.GL_VERTEX_SHADER   GLES20.GL_FRAGMENT_SHADER
+         * @param sourceCode shader的脚本
+         * @return shader索引
+         */
+        private int loadShader(int shaderType, String sourceCode) {
+            // 创建一个新shader
+            int shader = GLES20.glCreateShader(shaderType);
+            // 若创建成功则加载shader
+            if (shader != 0) {
+                // 加载shader的源代码
+                GLES20.glShaderSource(shader, sourceCode);
+                // 编译shader
+                GLES20.glCompileShader(shader);
+                // 存放编译成功shader数量的数组
+                int[] compiled = new int[1];
+                // 获取Shader的编译情况
+                GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
+                LogUtil.e("=========compiled[0]" + compiled[0]);
+                if (compiled[0] == 0) {
+                    //若编译失败则显示错误日志并删除此shader
+                    LogUtil.e("ES20_ERROR", "Could not compile shader " + shaderType + ":");
+                    LogUtil.e("ES20_ERROR", GLES20.glGetShaderInfoLog(shader));
+                    GLES20.glDeleteShader(shader);
+                    shader = 0;
+                }
+            }
+            return shader;
+        }
+
+        private FloatBuffer getVertices() {
+            float vertices[] = {
+                    -0.25f, 0.25f, 0.0f,   // top left
+                    -0.25f, -0.25f, 0.0f,   // bottom left
+                    0.25f, -0.25f, 0.0f,   // bottom right
+                    0.25f, 0.25f, 0.0f
+            };
+
+            // 创建顶点坐标数据缓冲
+            // vertices.length*4是因为一个float占四个字节
+            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
+            // 设置字节顺序
+            byteBuffer.order(ByteOrder.nativeOrder());
+            // 转换为Float型缓冲
+            FloatBuffer floatBuffer = byteBuffer.asFloatBuffer();
+            // 向缓冲区中放入顶点坐标数据
+            floatBuffer.put(vertices);
+            // 设置缓冲区起始位置
+            floatBuffer.position(0);
+            return floatBuffer;
+        }
+    }
+
 
 }

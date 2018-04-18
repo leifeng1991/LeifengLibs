@@ -25,6 +25,10 @@
     <!-- 未知来源应用 -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
     <application
         android:name=".base.BaseApplication"
         android:allowBackup="true"
@@ -41,6 +45,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".base.BaseWebActivity" />
+        <activity android:name=".TestKotlinActivity" >
+
+        </activity>
     </application>
 
 </manifest>
