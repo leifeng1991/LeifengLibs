@@ -26,7 +26,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 描述:
+ * 描述:(注：RecyclerView设置padding时有问题)
  *
  * @author leifeng
  * 2018/4/16 17:13
@@ -35,6 +35,7 @@ import java.lang.annotation.RetentionPolicy;
 public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
     private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
     private Drawable mDivider;
+    private int headerCount = 0;
 
     public GridDividerItemDecoration(Context context) {
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
@@ -160,10 +161,18 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         // item位置
         int itemPosition = parent.getChildAdapterPosition(view);
+        if (itemPosition < getHeaderCount()) {
+            outRect.set(0, 0, 0, 0);
+            return;
+        }
+        int headerCount = getHeaderCount();
+        itemPosition -= headerCount;
         // 列数
         int spanCount = getSpanCount(parent);
         // item总数
         int childCount = parent.getAdapter().getItemCount();
+        childCount -= headerCount;
+        LogUtil.e("=========" + itemPosition + "==" + childCount + "===" + headerCount);
         // true:垂直 false：水平
         boolean isVertical = isVertical(parent);
         RecyclerView.LayoutManager layoutManager = parent.getLayoutManager();
@@ -212,5 +221,13 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
             return orientation == StaggeredGridLayoutManager.VERTICAL;
         }
         return false;
+    }
+
+    public int getHeaderCount() {
+        return headerCount;
+    }
+
+    public void setHeaderCount(int headerCount) {
+        this.headerCount = headerCount;
     }
 }

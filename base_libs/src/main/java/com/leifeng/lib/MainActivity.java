@@ -2,12 +2,13 @@ package com.leifeng.lib;
 
 import android.Manifest;
 import android.content.Context;
+import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import com.leifeng.lib.net.RetrofitUtils;
 import com.leifeng.lib.net.observer.BaseObserver;
 import com.leifeng.lib.recyclerview.BaseAdapter;
 import com.leifeng.lib.recyclerview.BaseViewHolder;
+import com.leifeng.lib.recyclerview.Divider;
 import com.leifeng.lib.recyclerview.GridDividerItemDecoration;
 import com.leifeng.lib.recyclerview.HeaderAndFooterWrapper;
 import com.leifeng.lib.recyclerview.ItemViewDelegate;
@@ -36,6 +38,7 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -46,6 +49,7 @@ import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 
 public class MainActivity extends PermissionActivity {
     private View mHeaderView;
+    private View mHeaderView1;
     private Banner mBanner;
     private RefreshLoadView mRefreshLoadView;
     private RecyclerView mRecyclerView;
@@ -62,6 +66,7 @@ public class MainActivity extends PermissionActivity {
     @Override
     protected void initView() {
         mHeaderView = getLayoutInflater().inflate(R.layout.view_header, null);
+        mHeaderView1 = getLayoutInflater().inflate(R.layout.view_header, null);
         mBanner = mHeaderView.findViewById(R.id.banner);
         mRefreshLoadView = findViewById(R.id.id_refresh_recycler_view);
         mRecyclerView = mRefreshLoadView.getRecyclerView();
@@ -92,12 +97,24 @@ public class MainActivity extends PermissionActivity {
         //banner设置方法全部调用完毕时最后调用
         mBanner.start();
         /***************************RefreshLoadView*******************************/
-        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, StaggeredGridLayoutManager.VERTICAL));
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,false));
-//        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext, 3, GridLayoutManager.HORIZONTAL, false));
+//        final StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL);
+//        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
+        // 防止在滑动过程中子View自动换位置
+//        staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+      /*  mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                staggeredGridLayoutManager.invalidateSpanAssignments(); //防止第一行到顶部有空白区域
+            }
+        });*/
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL,false));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext, 3, GridLayoutManager.HORIZONTAL, false));
         GridDividerItemDecoration gridDividerItemDecoration = new GridDividerItemDecoration(mContext);
+        gridDividerItemDecoration.setHeaderCount(1);
         gridDividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.shape_divider));
-        mRecyclerView.addItemDecoration(gridDividerItemDecoration);
+//        mRecyclerView.addItemDecoration(gridDividerItemDecoration);
+        mRecyclerView.addItemDecoration(Divider.builder().color(Color.YELLOW).width(20).height(20).headerCount(1).build());
         mRecyclerView.setItemAnimator(new SlideInRightAnimator());
         adapter = new MyAdapter(getApplicationContext(), R.layout.adapter_list_item);
 //        mRecyclerView.setAdapter(adapter);
@@ -156,6 +173,9 @@ public class MainActivity extends PermissionActivity {
         mGlSurfaceView.setRenderer(new MyRenderer());
         // 设置渲染模式
         mGlSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+        /***********************排序相关*****************************/
+        int[] values = new int[]{26, 53, 48, 11, 13, 48, 32, 15};
+        sort(values);
     }
 
     @Override
@@ -182,6 +202,7 @@ public class MainActivity extends PermissionActivity {
         /********************************adapter添加头部和尾部**************************************/
         mHeaderAndFooterWrapper = new HeaderAndFooterWrapper(adapter);
 //        mHeaderAndFooterWrapper.addHeaderView(mHeaderView);
+        mHeaderAndFooterWrapper.addHeaderView(mHeaderView1);
         mRecyclerView.setAdapter(mHeaderAndFooterWrapper);
 
         /*************************多种样式adapter**************************************/
@@ -199,7 +220,7 @@ public class MainActivity extends PermissionActivity {
             @Override
             public void convert(BaseViewHolder holder, OnLineOrderListBean.DataBean s, int position) {
                 TextView textView = holder.itemView.findViewById(R.id.id_text);
-                textView.setText(position + "");
+                textView.setText(String.format(Locale.CHINA, "%d", position));
             }
         });
         adapter.addItemViewDelegate(new ItemViewDelegate<OnLineOrderListBean.DataBean>() {
@@ -343,6 +364,46 @@ public class MainActivity extends PermissionActivity {
                         LogUtil.e("===========大小" + total + "==百分比" + progress);
                     }
                 });*/
+    }
+
+    private void sort(int[] values) {
+        // 直接插入排序
+        LogUtil.e("===============1" + System.currentTimeMillis());
+        for (int i = 1; i < values.length; i++) {
+            if (values[i] < values[i - 1]) {
+                int temp = values[i];
+                values[i] = values[i - 1];
+//                values[i - 1] = temp;
+                int j = i - 2;
+                for (; j >= 0 && temp < values[j]; j--) {
+                    // 记录后移
+                    values[j + 1] = values[j];
+                }
+                values[j + 1] = temp;
+            }
+//            LogUtil.e("===========sort" + Arrays.toString(values));
+
+        }
+        LogUtil.e("===============1" + System.currentTimeMillis());
+        // 折半排序
+        for (int i = 1; i < values.length; i++) {
+            int temp = values[i]; //保存待插入元素
+            int hi = i - 1;
+            int lo = 0;  //设置初始区间
+            while (lo <= hi) {  //折半确定插入位置
+                int mid = (lo + hi) / 2;
+                if (temp < values[mid])
+                    hi = mid - 1;
+                else lo = mid + 1;
+            }
+            for (int j = i - 1; j > hi; j--)
+                values[j + 1] = values[j]; //移动元素
+            values[hi + 1] = temp;
+
+//            LogUtil.e("===========sort" + Arrays.toString(values));
+        }
+        LogUtil.e("===============1" + System.currentTimeMillis());
+
     }
 
     /*********************************adapter***********************************/
