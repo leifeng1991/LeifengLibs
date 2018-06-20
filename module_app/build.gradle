@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
@@ -7,7 +7,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.leifeng.module.app"
+//        applicationId "com.leifeng.module.app"
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1

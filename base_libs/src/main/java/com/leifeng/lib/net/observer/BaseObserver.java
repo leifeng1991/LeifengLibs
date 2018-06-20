@@ -1,11 +1,9 @@
 package com.leifeng.lib.net.observer;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.TextUtils;
-
 
 import com.leifeng.lib.net.APIException;
 import com.leifeng.lib.net.BaseBean;
@@ -92,7 +90,6 @@ public abstract class BaseObserver<T extends BaseBean> implements Observer<T> {
         BaseBean baseBean = new BaseBean();
         baseBean.setCode(code);
         baseBean.setMessage(errorMsg);
-        onFailed((T) baseBean);
         dismiss();
 
     }

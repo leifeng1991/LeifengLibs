@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -97,7 +98,7 @@ public class MainActivity extends PermissionActivity {
         //banner设置方法全部调用完毕时最后调用
         mBanner.start();
         /***************************RefreshLoadView*******************************/
-//        final StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.HORIZONTAL);
+//        final StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
 //        mRecyclerView.setLayoutManager(staggeredGridLayoutManager);
         // 防止在滑动过程中子View自动换位置
 //        staggeredGridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
@@ -108,13 +109,13 @@ public class MainActivity extends PermissionActivity {
                 staggeredGridLayoutManager.invalidateSpanAssignments(); //防止第一行到顶部有空白区域
             }
         });*/
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL,false));
-        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext, 3, GridLayoutManager.HORIZONTAL, false));
+//        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL,false));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(mContext, 3, GridLayoutManager.VERTICAL, false));
         GridDividerItemDecoration gridDividerItemDecoration = new GridDividerItemDecoration(mContext);
         gridDividerItemDecoration.setHeaderCount(1);
         gridDividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.shape_divider));
 //        mRecyclerView.addItemDecoration(gridDividerItemDecoration);
-        mRecyclerView.addItemDecoration(Divider.builder().color(Color.YELLOW).width(20).height(20).headerCount(1).build());
+        mRecyclerView.addItemDecoration(Divider.builder().color(Color.YELLOW).width(20).height(20).headerCount(1).footerCount(1).build());
         mRecyclerView.setItemAnimator(new SlideInRightAnimator());
         adapter = new MyAdapter(getApplicationContext(), R.layout.adapter_list_item);
 //        mRecyclerView.setAdapter(adapter);
@@ -176,6 +177,11 @@ public class MainActivity extends PermissionActivity {
         /***********************排序相关*****************************/
         int[] values = new int[]{26, 53, 48, 11, 13, 48, 32, 15};
         sort(values);
+        /***********************************************************/
+
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        dialog.setContentView(mHeaderView);
+        dialog.show();
     }
 
     @Override
@@ -202,7 +208,7 @@ public class MainActivity extends PermissionActivity {
         /********************************adapter添加头部和尾部**************************************/
         mHeaderAndFooterWrapper = new HeaderAndFooterWrapper(adapter);
 //        mHeaderAndFooterWrapper.addHeaderView(mHeaderView);
-        mHeaderAndFooterWrapper.addHeaderView(mHeaderView1);
+        mHeaderAndFooterWrapper.addFootView(mHeaderView1);
         mRecyclerView.setAdapter(mHeaderAndFooterWrapper);
 
         /*************************多种样式adapter**************************************/

@@ -5,25 +5,14 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
 import android.view.View;
 
-import com.leifeng.lib.R;
 import com.leifeng.lib.utils.LogUtil;
-import com.yanyusong.y_divideritemdecoration.Y_Divider;
-import com.yanyusong.y_divideritemdecoration.Y_DividerBuilder;
-import com.yanyusong.y_divideritemdecoration.Y_DividerItemDecoration;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * 描述:(注：RecyclerView设置padding时有问题)
@@ -74,7 +63,7 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
         return spanCount;
     }
 
-    public void drawHorizontal(Canvas c, RecyclerView parent) {
+    private void drawHorizontal(Canvas c, RecyclerView parent) {
         int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
@@ -90,7 +79,7 @@ public class GridDividerItemDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-    public void drawVertical(Canvas c, RecyclerView parent) {
+    private void drawVertical(Canvas c, RecyclerView parent) {
         final int childCount = parent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             final View child = parent.getChildAt(i);
